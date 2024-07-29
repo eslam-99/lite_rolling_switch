@@ -36,6 +36,7 @@ class LiteRollingSwitch extends StatefulWidget {
   final Function onTap;
   final Function onDoubleTap;
   final Function onSwipe;
+  final bool? checkRtl;
 
   LiteRollingSwitch({
     this.value = false,
@@ -54,6 +55,7 @@ class LiteRollingSwitch extends StatefulWidget {
     required this.onDoubleTap,
     required this.onSwipe,
     required this.onChanged,
+    this.checkRtl,
   });
 
   @override
@@ -66,6 +68,7 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
   late AnimationController animationController;
   late Animation<double> animation;
   late bool turnState;
+  late bool checkRtl;
 
   double value = 0.0;
 
@@ -92,6 +95,7 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
       });
     });
     turnState = widget.value;
+    checkRtl = widget.checkRtl ?? false;
 
     // Executes a function only one time after the layout is completed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -129,16 +133,16 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
         child: Stack(
           children: <Widget>[
             Transform.translate(
-              offset: isRTL(context)
+              offset: isRTL(context, widget.checkRtl ?? false)
                   ? Offset(-10 * value, 0)
                   : Offset(10 * value, 0), //original
               child: Opacity(
                 opacity: (1 - value).clamp(0.0, 1.0),
                 child: Container(
-                  padding: isRTL(context)
+                  padding: isRTL(context, widget.checkRtl ?? false)
                       ? EdgeInsets.only(left: 10)
                       : EdgeInsets.only(right: 10),
-                  alignment: isRTL(context)
+                  alignment: isRTL(context, widget.checkRtl ?? false)
                       ? Alignment.centerLeft
                       : Alignment.centerRight,
                   height: 40,
@@ -153,16 +157,16 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
               ),
             ),
             Transform.translate(
-              offset: isRTL(context)
+              offset: isRTL(context, widget.checkRtl ?? false)
                   ? Offset(-10 * (1 - value), 0)
                   : Offset(10 * (1 - value), 0), //original
               child: Opacity(
                 opacity: value.clamp(0.0, 1.0),
                 child: Container(
-                  padding: isRTL(context)
+                  padding: isRTL(context, widget.checkRtl ?? false)
                       ? EdgeInsets.only(right: 5)
                       : EdgeInsets.only(left: 5),
-                  alignment: isRTL(context)
+                  alignment: isRTL(context, widget.checkRtl ?? false)
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   height: 40,
@@ -177,7 +181,7 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
               ),
             ),
             Transform.translate(
-              offset: isRTL(context)
+              offset: isRTL(context, widget.checkRtl ?? false)
                   ? Offset((-widget.width + 50) * value, 0)
                   : Offset((widget.width - 50) * value, 0),
               child: Transform.rotate(
@@ -237,6 +241,6 @@ class _RollingSwitchState extends State<LiteRollingSwitch>
   }
 }
 
-bool isRTL(BuildContext context) {
-  return Bidi.isRtlLanguage(Localizations.localeOf(context).languageCode);
+bool isRTL(BuildContext context, bool checkRtl) {
+  return checkRtl ? Bidi.isRtlLanguage(Localizations.localeOf(context).languageCode) : false;
 }
